@@ -147,7 +147,7 @@ namespace CrawlerApp.Services
             using var driver = new ChromeDriver();
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
 
-            driver.Navigate().GoToUrl(_url + "/purchases?active&page=1&per_page=30");
+            driver.Navigate().GoToUrl(_url + "/purchases?active");
 
             while (true)
             {
