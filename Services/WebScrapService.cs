@@ -95,11 +95,11 @@ namespace CrawlerApp.Services
             
             foreach (var row in rows) 
             {
-                var name = row.SelectSingleNode("./td[2]").InnerText;
-                var quantity = row.SelectSingleNode("./td[6]").InnerText;
-                var measurement = row.SelectSingleNode("./td[5]").InnerText;
+                var name = row.SelectSingleNode("./td[2]").GetTextFromNode();
+                var quantity = row.SelectSingleNode("./td[6]").GetTextFromNode();
+                var measurement = row.SelectSingleNode("./td[5]").GetTextFromNode();
 
-                _= int.TryParse(quantity, out int resultQuantity);
+                _ = int.TryParse(quantity, out int resultQuantity);
 
                 Item item = new Item
                 {
@@ -175,7 +175,7 @@ namespace CrawlerApp.Services
 
                 wait.Until(d =>
                 {
-                    var newText = d.FindElement(By.XPath("(//tr)[2]")).Text;
+                    var newText = d.FindElement(By.XPath("(//tr)[2]")).Text;    
                     return newText != firstRowText;
                 });
             }
