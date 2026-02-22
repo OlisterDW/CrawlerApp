@@ -55,8 +55,7 @@ namespace CrawlerApp.Services
             var priceLimit = details
                 .SelectSingleNode(".//tbody/tr[10]/td[2]").GetTextFromNode();
 
-            decimal price = 0;
-           _ = decimal.TryParse(priceLimit, out price);
+            _ = decimal.TryParse(priceLimit, out decimal price);
 
             var contactName = details
                 .SelectSingleNode(".//tbody/tr[2]/td[2]/div[1]").GetTextFromNode();
@@ -66,6 +65,7 @@ namespace CrawlerApp.Services
 
             var tableName =details.SelectSingleNode("//div[contains(text(),'Перечень требуемых позиций')]");
             List<Item> items = new List<Item>();
+
             if (tableName != null)
             {
                 var rows = details.SelectNodes("./div/div[4]/div/div/div/div/div[6]/div[2]/div/table/tbody/tr");
@@ -89,7 +89,7 @@ namespace CrawlerApp.Services
             return purchase;
         }
 
-        private List<Item> GetItems(HtmlNodeCollection rows, decimal price)
+        private  static List<Item> GetItems(HtmlNodeCollection rows, decimal price)
         {
             List<Item> purchaseItem = new List<Item>();
             
@@ -120,7 +120,7 @@ namespace CrawlerApp.Services
          }
         
 
-        private HtmlNode GetDetails(string address)
+        private static HtmlNode GetDetails(string address)
         {
             var options = new ChromeOptions();
             using (var driver = new ChromeDriver(options))
