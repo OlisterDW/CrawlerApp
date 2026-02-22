@@ -15,7 +15,7 @@ namespace CrawlerApp.Services
 
         public void SavePurchases(List<Purchase> purchases) 
         {
-            XmlSerializer xmlSerializer = new (typeof(List<Purchase>));
+            XmlSerializer xmlSerializer = new (typeof(List<Purchase>), new XmlRootAttribute("Purchases"));
             using (FileStream fs = new($"{_path}/purchases.xml", FileMode.OpenOrCreate))
             {
                 xmlSerializer.Serialize(fs, purchases);

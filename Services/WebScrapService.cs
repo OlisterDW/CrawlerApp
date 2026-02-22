@@ -43,50 +43,8 @@ namespace CrawlerApp.Services
 
             var details = GetDetails(address);
             
-            var description = details
-                .SelectSingleNode(".//tbody/tr[3]/td[2]").GetTextFromNode();
+            return new Purchase(parsedNumber, customer, details);
 
-            var applicationStart = details
-                .SelectSingleNode(".//tbody/tr[4]/td[2]").GetTextFromNode();
-
-            var applicationEnd = details
-                .SelectSingleNode(".//tbody/tr[5]/td[2]").GetTextFromNode();
-
-            var priceLimit = details
-                .SelectSingleNode(".//tbody/tr[10]/td[2]").GetTextFromNode();
-
-            _ = decimal.TryParse(priceLimit, out decimal price);
-
-            var contactName = details
-                .SelectSingleNode(".//tbody/tr[2]/td[2]/div[1]").GetTextFromNode();
-
-            var contactPhone = details
-                .SelectSingleNode(".//tbody/tr[2]/td[2]/div[2]").GetTextFromNode();
-
-            var tableName =details.SelectSingleNode("//div[contains(text(),'Перечень требуемых позиций')]");
-            List<Item> items = new List<Item>();
-
-            if (tableName != null)
-            {
-                var rows = details.SelectNodes("./div/div[4]/div/div/div/div/div[6]/div[2]/div/table/tbody/tr");
-                items = GetItems(rows, price);
-            }
-            
-            var purchase = new Purchase()
-            {
-                Url = address,
-                Number = parsedNumber,
-                Description = description,
-                ApplicationStart = applicationStart.ParseToOffsetDate(),
-                ApplicationEnd = applicationEnd.ParseToOffsetDate(),
-                TotalPrice = price,
-                ContactPersonName = contactName,
-                ContactPersonPhone = contactPhone,
-                Customer = customer,
-               Items = items,
-            };
-
-            return purchase;
         }
 
         private  static List<Item> GetItems(HtmlNodeCollection rows, decimal price)
@@ -100,6 +58,7 @@ namespace CrawlerApp.Services
                 var measurement = row.SelectSingleNode("./td[5]").GetTextFromNode();
 
                 _ = int.TryParse(quantity, out int resultQuantity);
+
 
                 Item item = new Item
                 {
@@ -120,7 +79,7 @@ namespace CrawlerApp.Services
          }
         
 
-        private static HtmlNode GetDetails(string address)
+        private static Details GetDetails(string address)
         {
             var options = new ChromeOptions();
             using (var driver = new ChromeDriver(options))
@@ -133,10 +92,49 @@ namespace CrawlerApp.Services
                 var doc = new HtmlDocument();
                 doc.LoadHtml(pageSource);
 
-                var node = doc.DocumentNode
-                    .SelectSingleNode("//main");
+                var description = doc.DocumentNode
+                .SelectSingleNode(".//tbody/tr[3]/td[2]").GetTextFromNode();
 
-                return node;
+                var applicationStart = doc.DocumentNode
+                    .SelectSingleNode(".//tbody/tr[4]/td[2]").GetTextFromNode();
+
+                var applicationEnd = doc.DocumentNode
+                    .SelectSingleNode(".//tbody/tr[5]/td[2]").GetTextFromNode();
+
+                var priceLimit = doc.DocumentNode
+                    .SelectSingleNode(".//tbody/tr[10]/td[2]").GetTextFromNode();
+
+                _ = decimal.TryParse(priceLimit, out decimal price);
+
+                var contactName = doc.DocumentNode
+                    .SelectSingleNode(".//tbody/tr[2]/td[2]/div[1]").GetTextFromNode();
+
+                var contactPhone = doc.DocumentNode
+                    .SelectSingleNode(".//tbody/tr[2]/td[2]/div[2]").GetTextFromNode();
+
+                var tableName = doc.DocumentNode
+                    .SelectSingleNode("//div[contains(text(),'Перечень требуемых позиций')]");
+                List<Item> items = new List<Item>();
+
+                if (tableName != null)
+                {
+                    var rows = doc.DocumentNode
+                        .SelectNodes(".//main/div/div[4]/div/div/div/div/div[6]/div[2]/div/table/tbody/tr");
+                    items = GetItems(rows, price);
+                }
+
+                var details = new Details
+                {
+                    Description = description,
+                    ApplicationEnd = applicationEnd.ParseToOffsetDate(),
+                    ApplicationStart = applicationEnd.ParseToOffsetDate(),
+                    TotalPrice = price,
+                    ContactPersonName  = contactName,
+                    ContactPersonPhone = contactPhone,
+                    Items = items
+                };
+
+                return details;
             }
         }
 
